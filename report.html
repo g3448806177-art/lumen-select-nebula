@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="nebula">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#06060d">
+<title>选品报告 · CCAMZSI</title>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/nebula-theme.css">
+<style>
+  /* ---------- shell ---------- */
+  body.k-app{ padding:0; }
+  .shell{ display:grid; grid-template-columns:232px minmax(0,1fr); align-items:start; min-width:0; }
+  .side{
+    position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:14px;
+    padding:18px 12px 14px; background:rgba(8,7,15,.72); border-right:1px solid var(--k-line); min-width:0;
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 6px 14px; }
+  .brand__mark{ width:34px; height:34px; border-radius:10px; background:var(--k-grad-cta); color:var(--k-on-accent); display:grid; place-items:center; font-size:10.5px; font-weight:700; letter-spacing:.03em; flex:none; box-shadow:0 8px 22px -10px rgba(139,92,246,.9); }
+  .brand b{ display:block; font-size:13.5px; letter-spacing:-.01em; }
+  .brand span{ display:block; font-size:10px; color:var(--k-muted); }
+  .nav{ display:flex; flex-direction:column; gap:1px; }
+  .nav__item{
+    display:flex; align-items:center; gap:9px; padding:8px 10px; border:1px solid transparent;
+    border-radius:8px; color:var(--k-ink-2); font-size:12.5px; text-decoration:none; text-align:left; background:transparent;
+  }
+  .nav__item svg{ width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+  .nav__item:hover{ background:var(--k-surface-2); color:var(--k-ink); }
+  .nav__item.is-active{ background:var(--k-accent-soft); border-color:var(--k-accent-border); color:var(--k-ink); font-weight:var(--k-fw-semibold); box-shadow:inset 2px 0 0 var(--k-accent); }
+  .nav__item.is-ghost{ color:var(--k-muted); border-style:dashed; }
+  .side__foot{ margin-top:auto; border-top:1px solid var(--k-line); padding:12px 6px 0; font-size:10.5px; color:var(--k-muted); }
+  .side__foot b{ display:block; color:var(--k-ink-2); font-size:11.5px; }
+  .side__foot a{ color:var(--k-muted); text-decoration:none; margin-right:10px; }
+  .side__foot a:hover{ color:var(--k-ink); }
+
+  .main{ padding:26px 32px 80px; max-width:1280px; width:100%; min-width:0; }
+  .page-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:16px; }
+  .crumb{ font-size:10.5px; color:var(--k-muted-2); font-family:var(--k-font-mono); margin-bottom:8px; }
+  .crumb a{ color:var(--k-muted); text-decoration:none; }
+  .crumb a:hover{ color:var(--k-ink); }
+  .page-head h1{ font-size:24px; line-height:1.15; letter-spacing:var(--k-track-heading); font-weight:var(--k-fw-semibold); }
+  .page-head .sub{ margin-top:6px; font-size:11.5px; color:var(--k-muted); }
+  .head-actions{ display:flex; align-items:center; gap:8px; flex:none; }
+
+  .tabs{ display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .tab{ display:inline-flex; align-items:center; gap:8px; padding:7px 13px; border:1px solid var(--k-line); border-radius:var(--k-r-pill); background:var(--k-surface); color:var(--k-ink-2); font-size:12px; }
+  .tab.is-active{ background:var(--k-accent-soft); border-color:var(--k-accent-border); color:var(--k-ink); font-weight:var(--k-fw-semibold); }
+  .tab__num{ width:18px; height:18px; border-radius:50%; background:var(--k-accent); color:var(--k-on-accent); display:grid; place-items:center; font-size:10px; font-weight:700; }
+
+  /* ---------- summary ---------- */
+  .summary{ padding:20px 22px; margin-bottom:14px; }
+  .summary__top{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .summary__title{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .summary__title h2{ font-size:17px; font-weight:var(--k-fw-semibold); letter-spacing:-.02em; }
+  .summary__meta{ margin-top:8px; font-size:11.5px; color:var(--k-muted); display:flex; flex-direction:column; gap:5px; }
+  .summary__params{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .chip{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:var(--k-r-pill); border:1px solid var(--k-line); background:var(--k-surface-2); font-size:10.5px; color:var(--k-ink-2); }
+  .chip b{ font-weight:var(--k-fw-semibold); color:var(--k-ink); font-family:var(--k-font-mono); }
+  .summary__metrics{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:14px; }
+  .metric{ border:1px solid var(--k-line); border-radius:var(--k-r-md); background:var(--k-surface-2); padding:10px 12px; }
+  .metric .k{ font-size:10px; color:var(--k-muted); letter-spacing:.03em; }
+  .metric .v{ margin-top:4px; font-size:20px; font-weight:var(--k-fw-semibold); letter-spacing:-.02em; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .metric .v small{ font-size:10.5px; font-weight:400; color:var(--k-muted); letter-spacing:0; }
+  .formula{ margin-top:12px; font-size:10.5px; line-height:1.7; color:var(--k-muted-2); max-width:980px; }
+
+  /* ---------- toolbar ---------- */
+  .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:14px 0 10px; }
+  .filters{ display:flex; gap:6px; flex-wrap:wrap; }
+  .fbtn{ display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:var(--k-r-pill); border:1px solid var(--k-line); background:var(--k-surface); color:var(--k-ink-2); font-size:11px; transition:border-color var(--k-dur-2) ease, background-color var(--k-dur-2) ease; }
+  .fbtn:hover{ border-color:var(--k-line-strong); color:var(--k-ink); }
+  .fbtn.is-active{ background:var(--k-accent-soft); border-color:var(--k-accent-border); color:var(--k-ink); font-weight:var(--k-fw-semibold); }
+  .fbtn__n{ font-family:var(--k-font-mono); font-size:10px; color:var(--k-muted); }
+  .toolbar__right{ display:flex; gap:8px; align-items:center; }
+  .k-btn[aria-pressed="true"].k-btn--quiet{ color:var(--k-ink); background:var(--k-surface-2); }
+
+  /* ---------- ranking table ---------- */
+  .table-card{ padding:18px 20px; margin-bottom:14px; }
+  .table-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+  .table-head h2{ font-size:15px; font-weight:var(--k-fw-semibold); letter-spacing:-.01em; }
+  .table-head p{ margin-top:4px; font-size:10.5px; color:var(--k-muted); }
+  .table-scroll{ margin:0 -20px; overflow:auto; }
+  .rank-table{ width:100%; border-collapse:collapse; table-layout:fixed; min-width:880px; }
+  .rank-table th{
+    padding:9px 12px; background:var(--k-surface-2); border-bottom:1px solid var(--k-line);
+    color:var(--k-muted-2); font-size:9px; font-weight:var(--k-fw-semibold); letter-spacing:.10em; text-transform:uppercase; text-align:left; white-space:nowrap;
+  }
+  .rank-table th:first-child,.rank-table td:first-child{ padding-left:20px; width:52px; }
+  .rank-table th:nth-child(2){ width:28%; }
+  .rank-table th:nth-child(3){ width:34%; }
+  .rank-table th:nth-child(4){ width:11%; }
+  .rank-table th:nth-child(5){ width:10%; }
+  .rank-table th:nth-child(6){ width:11%; }
+  .rank-table th:last-child,.rank-table td:last-child{ padding-right:20px; }
+  .rank-table td{ padding:11px 12px; border-bottom:1px solid var(--k-line); font-size:11.5px; vertical-align:middle; }
+  .rank-table tbody tr{ cursor:pointer; transition:background-color 160ms ease; }
+  .rank-table tbody tr:hover{ background:var(--k-surface-2); }
+  .rank-table tbody tr:focus-visible{ outline-offset:-2px; background:var(--k-surface-2); }
+  .rank-table tbody tr:last-child td{ border-bottom:0; }
+  .rank-table .num{ font-variant-numeric:tabular-nums; }
+  .rank-table .rank-no{ font-family:var(--k-font-mono); color:var(--k-muted); }
+  .rank-table tr.is-top3 td:first-child{ box-shadow:inset 2px 0 0 var(--k-accent); }
+  .cand{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .thumb{ width:34px; height:34px; border-radius:8px; border:1px solid var(--k-line); background:linear-gradient(135deg,var(--k-surface-2),var(--k-surface-3)); display:grid; place-items:center; font-size:8px; font-weight:700; color:var(--k-muted); flex:none; letter-spacing:.02em; }
+  .cand span{ min-width:0; }
+  .cand b{ display:block; font-size:11.5px; font-weight:var(--k-fw-semibold); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cand small{ display:block; font-size:10px; color:var(--k-muted); font-family:var(--k-font-mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .verdict-cell{ display:flex; flex-direction:column; align-items:flex-start; gap:3px; min-width:0; }
+  .reason{ width:100%; font-size:10px; color:var(--k-muted); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .reason b{ font-weight:var(--k-fw-semibold); color:var(--k-ink-2); }
+  .empty-row td{ padding:30px; text-align:center; color:var(--k-muted); font-size:12px; }
+
+  /* ---------- decision cards ---------- */
+  .decision-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin:18px 0 10px; }
+  .decision-head h2{ font-size:15px; font-weight:var(--k-fw-semibold); }
+  .decision-head p{ margin-top:4px; font-size:10.5px; color:var(--k-muted); }
+  .dcard{ margin-bottom:10px; padding:0; overflow:hidden; }
+  .dcard > summary{
+    list-style:none; display:grid; grid-template-columns:auto 48px minmax(0,1fr) auto; gap:12px; align-items:center;
+    padding:14px 16px; cursor:pointer; user-select:none;
+  }
+  .dcard > summary::-webkit-details-marker{ display:none; }
+  .dcard > summary:hover{ background:var(--k-surface-2); }
+  .dcard > summary:focus-visible{ outline-offset:-3px; }
+  .dscore{ width:48px; height:48px; position:relative; flex:none; }
+  .dscore svg{ width:48px; height:48px; transform:rotate(-90deg); }
+  .dscore b{ position:absolute; inset:0; display:grid; place-items:center; font-size:13px; font-weight:var(--k-fw-semibold); font-variant-numeric:tabular-nums; }
+  .dsum{ min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .dsum__top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .dsum__rank{ font-family:var(--k-font-mono); font-size:11px; color:var(--k-muted); }
+  .dsum__title{ font-size:12.5px; font-weight:var(--k-fw-medium); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dsum__meta{ font-size:10px; color:var(--k-muted); font-family:var(--k-font-mono); }
+  .dchev{ width:26px; height:26px; border-radius:50%; border:1px solid var(--k-line); display:grid; place-items:center; color:var(--k-muted); transition:transform var(--k-dur-3) var(--k-ease), background-color var(--k-dur-2) ease; flex:none; }
+  .dcard[open] .dchev{ transform:rotate(180deg); background:var(--k-accent); border-color:var(--k-accent); color:var(--k-on-accent); }
+  .dcard__body{ border-top:1px solid var(--k-line); padding:14px 16px 16px; }
+  .rows{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .row-block{ border-left:3px solid var(--k-line-strong); background:var(--k-surface-2); border-radius:0 var(--k-r-sm) var(--k-r-sm) 0; padding:8px 10px; min-width:0; }
+  .row-block.is-good{ border-left-color:var(--k-success); }
+  .row-block.is-warn{ border-left-color:var(--k-warn); }
+  .row-block.is-bad{ border-left-color:var(--k-down); }
+  .row-block dt{ font-size:10px; font-weight:var(--k-fw-semibold); color:var(--k-muted); letter-spacing:.02em; }
+  .row-block dd{ margin:3px 0 0; font-size:11.5px; line-height:1.62; color:var(--k-ink-2); }
+  .refs{ display:inline-flex; gap:3px; margin-left:4px; vertical-align:1px; flex-wrap:wrap; }
+  .ref{ border:1px solid var(--k-accent-border); background:var(--k-accent-soft); color:#d2caff; border-radius:4px; font-family:var(--k-font-mono); font-size:8.5px; padding:0 3px; cursor:pointer; line-height:1.5; }
+  .ref:hover{ background:rgba(139,124,255,.45); color:#fff; }
+  .callouts{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .callout{ border:1px solid var(--k-line); border-radius:var(--k-r-sm); padding:8px 10px; font-size:11.5px; line-height:1.65; background:var(--k-surface); }
+  .callout b{ font-weight:var(--k-fw-semibold); }
+  .callout--unknown{ border-left:3px solid var(--k-warn); }
+  .callout--action{ border-left:3px solid var(--k-accent); background:var(--k-surface-2); }
+  .ev{ margin-top:10px; border:1px dashed var(--k-line-strong); border-radius:var(--k-r-sm); background:var(--k-surface); }
+  .ev > summary{ cursor:pointer; list-style:none; padding:8px 11px; font-size:11px; color:var(--k-muted); display:flex; align-items:center; gap:7px; }
+  .ev > summary::-webkit-details-marker{ display:none; }
+  .ev > summary b{ color:var(--k-ink-2); font-weight:var(--k-fw-semibold); }
+  .ev[open] > summary{ border-bottom:1px solid var(--k-line); }
+  .ev__list{ list-style:none; margin:0; padding:8px 10px; display:flex; flex-direction:column; gap:6px; }
+  .ev__item{ border-radius:var(--k-r-xs); background:var(--k-surface-2); padding:8px 10px; font-size:11px; line-height:1.6; }
+  .ev__item.is-flash{ animation:flash 1.2s var(--k-ease); }
+  @keyframes flash{ 0%{ box-shadow:0 0 0 2px var(--k-accent); } 100%{ box-shadow:0 0 0 0 transparent; } }
+  .ev__id{ font-family:var(--k-font-mono); font-weight:var(--k-fw-semibold); color:#d2caff; }
+  .ev__meta{ color:var(--k-muted); font-size:10px; margin-left:4px; }
+  .ev__body{ margin-top:2px; color:var(--k-ink-2); }
+  .ev__src{ margin-top:2px; font-size:9.5px; color:var(--k-muted-2); word-break:break-all; }
+
+  .page-foot{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:20px; padding-top:14px; border-top:1px solid var(--k-line); }
+  .page-foot a{ font-size:11.5px; color:var(--k-muted); text-decoration:none; }
+  .page-foot a:hover{ color:var(--k-ink); }
+  .page-foot span{ font-size:10px; color:var(--k-muted-2); font-family:var(--k-font-mono); letter-spacing:.12em; text-transform:uppercase; }
+
+  /* ---------- loading / error ---------- */
+  .sk{ display:block; height:14px; border-radius:6px; background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.1),rgba(255,255,255,.04)); background-size:200% 100%; animation:shimmer 1.3s linear infinite; }
+  .sk--card{ height:76px; border-radius:18px; margin-bottom:10px; }
+  @keyframes shimmer{ from{ background-position:200% 0; } to{ background-position:-200% 0; } }
+  body.is-error .table-card, body.is-error .toolbar, body.is-error .decision-head{ display:none; }
+
+  /* ---------- toast ---------- */
+  .toasts{ position:fixed; right:18px; bottom:18px; z-index:120; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+  .toast{ background:rgba(16,13,30,.88); color:var(--k-ink); border:1px solid rgba(255,255,255,.12); border-radius:var(--k-r-md); padding:10px 14px; font-size:12px; box-shadow:var(--k-shadow-lift); animation:k-toast-in .24s var(--k-ease); position:relative; overflow:hidden; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); max-width:min(92vw,420px); }
+  .toast::after{ content:""; position:absolute; left:0; bottom:0; height:2px; width:100%; background:var(--k-grad-cta); transform-origin:0 50%; animation:k-toast-bar 2.8s linear forwards; }
+  @keyframes k-toast-in{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
+  @keyframes k-toast-bar{ from{ transform:scaleX(1);} to{ transform:scaleX(0);} }
+
+  /* ---------- mobile action bar ---------- */
+  .mbar{ display:none; }
+
+  @media (max-width:1180px){
+    .summary__metrics{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  }
+  @media (max-width:920px){
+    .shell{ grid-template-columns:1fr; }
+    .side{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--k-line); }
+    .nav{ flex-direction:row; flex-wrap:wrap; }
+    .side__foot{ display:none; }
+    .main{ padding:20px 16px 60px; }
+    .rows,.callouts{ grid-template-columns:1fr; }
+    .dcard > summary{ grid-template-columns:auto 40px minmax(0,1fr) auto; }
+    .dscore,.dscore svg{ width:40px; height:40px; }
+  }
+  @media (max-width:768px){
+    .main{ padding-bottom:96px; }
+    .head-actions .k-btn[data-act="back"], .head-actions .k-btn[data-act="export"]{ display:none; }
+    .mbar{ display:flex; gap:8px; position:fixed; left:0; right:0; bottom:0; z-index:90; padding:10px 16px calc(10px + env(safe-area-inset-bottom)); background:rgba(8,7,15,.86); border-top:1px solid var(--k-line); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); }
+    .mbar .k-btn{ flex:1; height:40px; }
+    .toasts{ bottom:72px; right:12px; left:12px; align-items:stretch; }
+  }
+  @media (max-width:600px){
+    .summary__metrics{ grid-template-columns:1fr 1fr; }
+    .summary{ padding:16px; }
+    .rank-table{ min-width:760px; }
+    .page-head h1{ font-size:21px; }
+  }
+  @media (max-width:480px){
+    .dscore,.dscore svg{ width:40px; height:40px; }
+    .dsum__title{ white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  }
+</style>
+</head>
+<body class="k-app">
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <div class="brand__mark" aria-hidden="true">CC</div>
+      <div><b>CCAMZSI</b><span>亚马逊美国站</span></div>
+    </div>
+    <nav class="nav" aria-label="主导航">
+      <a class="nav__item" href="#" data-nav="首页">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg>首页</a>
+      <a class="nav__item is-active" href="#" data-nav="选品" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.2"/><rect x="13" y="4" width="7" height="7" rx="1.2"/><rect x="4" y="13" width="7" height="7" rx="1.2"/><rect x="13" y="13" width="7" height="7" rx="1.2"/></svg>选品</a>
+      <a class="nav__item is-ghost" href="#" data-nav="上架">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5m0 0L8 9m4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>上架</a>
+      <a class="nav__item is-ghost" href="#" data-nav="广告">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>广告</a>
+      <a class="nav__item is-ghost" href="#" data-nav="我的店铺">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1 11H5z"/><path d="M4 9l1.5-4h13L20 9"/><path d="M9 13h6"/></svg>我的店铺</a>
+      <a class="nav__item" href="#" data-nav="用量">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/><circle cx="12" cy="17" r="1.4"/></svg>用量</a>
+    </nav>
+    <div class="side__foot">
+      <b>xujunbin</b><div>自有团队</div>
+      <div style="margin-top:6px;"><a href="#" data-nav="账号设置">账号设置</a><a href="nebula-login.html">退出登录</a></div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="page-head">
+      <div>
+        <div class="crumb"><a href="#" data-nav="工作台 / 选品">工作台 / 选品</a> / 报告详情</div>
+        <h1>选品报告</h1>
+        <p class="sub">同一份报告全团队可见；数据与评分口径来自报告提交时的参数。</p>
+      </div>
+      <div class="head-actions">
+        <button class="k-btn k-btn--ghost k-btn--sm" type="button" data-act="calm" aria-pressed="false" title="降低星空光效">降低光效</button>
+        <button class="k-btn k-btn--ghost k-btn--sm" type="button" data-act="back">返回列表</button>
+        <button class="k-btn k-btn--accent k-btn--sm" type="button" data-act="export" data-testid="report-export">导出 XLS</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <span class="tab is-active"><span class="tab__num">1</span>GBDT 成功率预测</span>
+    </div>
+
+    <section class="k-card summary" aria-label="报告摘要" data-testid="section-report">
+      <div class="summary__top">
+        <div class="summary__title">
+          <h2>上线测试 2026-10-22</h2>
+          <span class="k-badge k-badge--success">已完成</span>
+          <span class="k-badge k-badge--accent">我的</span>
+        </div>
+      </div>
+      <div class="summary__meta">
+        <span>xujunbin 提交于 2026/10/23 00:57</span>
+        <div class="summary__params">
+          <span class="chip">计划上架 <b>2026-12-21</b></span>
+          <span class="chip">CPC <b>$0.80</b></span>
+          <span class="chip">广告转化率 <b>8%</b></span>
+          <span class="chip">关税 <b>0%</b></span>
+        </div>
+      </div>
+      <div class="summary__metrics">
+        <div class="metric"><div class="k">候选数</div><div class="v"><span id="mCand">7</span> <small>个</small></div></div>
+        <div class="metric"><div class="k">建议尽调</div><div class="v"><span id="mGo">2</span> <small>个</small></div></div>
+        <div class="metric"><div class="k">平均综合评分</div><div class="v"><span id="mAvg">74</span> <small>/100</small></div></div>
+        <div class="metric"><div class="k">卖家精灵调用</div><div class="v">8 <small>/ 预计 10 次</small></div></div>
+      </div>
+      <p class="formula">综合评分 = 模型算出的成功率（按团队成功标准：90 天日均销量进同期新品前 30%、不衰减、还在售、评分 4.0 以上）在历史新品里排第几个百分位。</p>
+    </section>
+
+    <div class="toolbar">
+      <div class="filters" id="filters" role="group" aria-label="结论筛选"></div>
+      <div class="toolbar__right">
+        <button class="k-btn k-btn--quiet k-btn--sm" type="button" data-act="expand" aria-pressed="false">展开全部</button>
+        <button class="k-btn k-btn--quiet k-btn--sm" type="button" data-act="collapse" aria-pressed="true">收起全部</button>
+      </div>
+    </div>
+
+    <section class="k-card table-card" aria-label="排序">
+      <div class="table-head">
+        <div>
+          <h2>排序</h2>
+          <p>过了便宜闸门、按综合评分排前 3 的建议尽调；否决的写明死在哪一关。</p>
+        </div>
+        <span class="k-badge">点击行定位决策卡</span>
+      </div>
+      <div class="table-scroll">
+        <table class="rank-table" id="rankTable">
+          <thead><tr>
+            <th scope="col">排名</th><th scope="col">候选</th><th scope="col">结论</th><th scope="col">综合评分</th><th scope="col">成功率</th><th scope="col">单位经济</th>
+          </tr></thead>
+          <tbody id="rankBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="decision-head">
+      <div>
+        <h2>决策卡</h2>
+        <p>默认全部收起；每个数字后面的 [E#] 是证据编号，点击可定位证据。</p>
+      </div>
+      <span class="k-badge" id="visibleCount">7 / 7</span>
+    </div>
+    <div id="cards"></div>
+    <div id="errorBox" hidden></div>
+
+    <footer class="page-foot">
+      <a href="#" data-nav="产品报告">‹ 回到产品报告</a>
+      <span>NEBULA / 02 · 原型 · 数据为示例 · 结构与真实报告详情页一致</span>
+    </footer>
+  </main>
+</div>
+
+<div class="mbar" aria-label="快捷操作">
+  <button class="k-btn k-btn--ghost" type="button" data-act="back">返回列表</button>
+  <button class="k-btn k-btn--accent" type="button" data-act="export">导出 XLS</button>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var QS = new URLSearchParams(location.search);
+  var STATE = QS.get('state');   // ?state=error | empty | exportfail  (demo helpers)
+  var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- sample data (示例数据) ---------- */
+  function mk(o){
+    return Object.assign({
+      assumption:'没填',
+      absence:'有同款（就是这个 ASIN），不用诊断',
+      demand:'月销 2,238 件，月销增长率 −8%；主关键词月搜 247,990；近 3 个月同比 +32%',
+      supply:'前 10 款占销量 45%，前 3 品牌占 26%；近 3 个月新品占 5%；亚马逊自营占 5%',
+      analog:'同子类目同价位近邻成功率 35%（32/92），主要死法：自然死亡（18）',
+      riskOk:true,
+      risk:'没命中授权角色、品牌词；专利、法规未检索',
+      launch:'2026-11 35% · 2026-12 41%（计划） · 2027-01 39% · 2027-02 39%',
+      gateOk:true,
+      gate:'三道闸门全过，进了深度尽调名单',
+      unknown:'单位经济里 头程 是估计值；专利、法规没有检索',
+      action:'进入尽调：专利人工复核、工厂正式报价、200 件小批量测款'
+    }, o);
+  }
+
+  var DATA = [
+    mk({ rank:1, asin:'B0EXA00001', title:'儿童户外投掷玩具套装 3-8 岁', price:'$27.72', verdict:'go', score:87, success:'41%', gateOk:true, thumb:'投掷' }),
+    mk({ rank:2, asin:'B0EXA00002', title:'蜘蛛拉绳发射器玩具', price:'$39.99', verdict:'go', score:72, success:'28%', gateOk:true, thumb:'发射',
+      launch:'2026-11 20% · 2026-12 28%（计划） · 2027-01 25% · 2027-02 25%' }),
+    mk({ rank:3, asin:'B0EXA00003', title:'蜘蛛轨道赛车套装 251 件', price:'$26.99', verdict:'hold', score:99, success:'74%', gateOk:false, thumb:'轨道',
+      reason:'批量筛查：月销增长率 −51%，低于 −30%；亚马逊自营占 41%，高于 30%',
+      scoreText:'99/100 · 成功率 74%（历史平均 22%）',
+      gate:'没过：批量筛查（月销增长率 −51%，低于 −30%）；批量筛查（亚马逊自营占 41%，高于 30%）',
+      demand:'月销 368 件，月销增长率 −51%',
+      risk:'没命中授权角色、品牌词；季节款（圣诞）；专利、法规未检索',
+      unknown:'单位经济里 头程 是估计值；需求：季节性没拆；专利、法规没有检索',
+      action:'没进深度尽调：看「便宜闸门」卡在哪；补数据或先看建议尽调的款',
+      launch:'季节款（圣诞）：2026-11 65% · 2026-12 74%（计划） · 2027-01 67% · 2027-02 67%' }),
+    mk({ rank:4, asin:'B0EXA00004', title:'五合一蜘蛛投掷游戏', price:'$24.99', verdict:'hold', score:86, success:'40%', gateOk:false, thumb:'投掷',
+      reason:'批量筛查：月销 124 件，低于 300 件',
+      gate:'没过：批量筛查（月销 124 件，低于 300 件）',
+      demand:'月销 124 件，月销增长率 −21%',
+      action:'没进深度尽调：看「便宜闸门」卡在哪；补数据或先看建议尽调的款' }),
+    mk({ rank:5, asin:'图片候选', title:'毛绒鲨鱼玩具（按关键词找同款）', price:'$19.99', verdict:'hold', score:55, success:'19%', gateOk:false, thumb:'毛绒',
+      reason:'风险硬过滤：标题疑似授权角色或品牌词；主关键词没有搜索量数据；类目前 10 占销量 62%',
+      absence:'没选结论；按关键词找到 10 个相似在售款，要人看是不是同款',
+      window:'没选窗口期档位',
+      demand:'主关键词「spider shark plush」没有搜索量数据',
+      riskOk:false,
+      risk:'标题有疑似授权角色或品牌词，要人工复核；专利、法规未检索',
+      gate:'没过：风险硬过滤（标题疑似授权角色或品牌词）；批量筛查（主关键词没有搜索量数据）；批量筛查（类目前 10 占 62%，高于 50%）',
+      unknown:'头程、FBA 配送费 是估计值；用途假设没填；窗口期利润没算；专利、法规没有检索',
+      action:'没进深度尽调：先人工复核授权风险，再看闸门卡在哪' }),
+    mk({ rank:6, asin:'B0EXA00006', title:'蜘蛛赛车轨道玩具 250 件', price:'$22.99', verdict:'no', score:80, success:'34%', gateOk:false, thumb:'赛车',
+      reason:'单位经济：利润率 9%，低于门槛 15%',
+      scoreText:'80/100 · 成功率 34%（历史平均 22%）',
+      gate:'没过：单位经济（单位经济否决）；批量筛查（月销 148 件，低于 300 件）',
+      demand:'月销 148 件，月销增长率 −96%',
+      risk:'没命中授权角色、品牌词；季节款（圣诞）；专利、法规未检索',
+      action:'否决（单位经济），记进误杀追踪名单，每季度复查',
+      launch:'季节款（圣诞）：2026-11 23% · 2026-12 34%（计划） · 2027-01 30% · 2027-02 30%' }),
+    mk({ rank:7, asin:'图片候选', title:'粘靶接球套装（按关键词找同款）', price:'$15.99', verdict:'no', score:41, success:'14%', gateOk:false, thumb:'接球',
+      reason:'单位经济否决；综合评分 41 低于 50；关键词月搜 621 低于 3,000',
+      absence:'没选结论；按关键词找到 10 个相似在售款，要人看是不是同款',
+      window:'没选窗口期档位',
+      demand:'主关键词「toss and catch game」月搜 621、月购买 19',
+      risk:'没命中授权角色、品牌词；专利、法规未检索',
+      gate:'没过：单位经济（单位经济否决）；批量筛查（综合评分 41，低于 50）；批量筛查（主关键词月搜 621，低于 3,000）',
+      unknown:'头程、FBA 配送费 是估计值；CPC 建议竞价 $3.06，高于填的 $0.80；用途假设没填；专利、法规没有检索',
+      action:'否决（单位经济），记进误杀追踪名单，每季度复查' })
+  ];
+
+  /* Every [E#] chip resolves to a row in that card's evidence list. */
+  function evidenceOf(d){
+    var p = parseFloat(d.price.replace('$','')) || 0;
+    var fee = '$' + (p * 0.15).toFixed(2);
+    function E(id, name, type, body, source){ return { id:id, name:name, type:type, body:body, source:source }; }
+    var win = '取数 2026-10-22';
+    return [
+      E('E1','单位经济计算表','计算 · '+win,'售价 '+d.price+'；采购 $1.64；头程 $1.59；FBA 配送 $6.02；佣金 '+fee+'；广告 $3.00（估计值：头程）','来源：计算；按新品评估 v1.1 的 G3 公式；其余参数为默认值'),
+      E('E2','提交时填写','人工录入 · '+win,'采购价 $1.64；计划上架 2026-12-21；CPC $0.80、广告转化率 8%、关税 0%','来源：人工录入；提交报告时填写'),
+      E('E3','商品基本数据','市场数据 · '+win+' · 时间窗 2026-09','售价 '+d.price+'；'+d.demand,'来源：卖家精灵 · 竞品查询（competitor_lookup）；marketplace=US'),
+      E('E4','关键词搜索量','市场数据 · '+win+' · 时间窗 2026-09',d.demand,'来源：卖家精灵 · 关键词研究（keyword_research）；marketplace=US'),
+      E('E5','需求趋势','市场数据 · '+win+' · 时间窗 近 12 个月',d.demand,'来源：卖家精灵 · ABA 趋势（aba_research_trend）；marketplace=US'),
+      E('E6','供给结构','市场数据 · '+win+' · 时间窗 2026-09',d.supply,'来源：卖家精灵 · 市场研究（market_research_statistics）；marketplace=US'),
+      E('E7','结构类比','模型 · '+win,d.analog,'来源：模型；近邻检索 toys-nn-v1'),
+      E('E8','风险过滤','规则 · '+win,d.risk,'来源：规则；授权角色 / 品牌词词表 + 专利、法规检索（未执行）'),
+      E('E9','新品成功率模型','模型 · '+win,'成功率 '+d.success+'（历史平均 22%）；综合评分 '+d.score+'/100','来源：模型；toys-gbdt-v2'),
+      E('E10','上架月份敏感度','模型 · '+win,d.launch,'来源：模型；toys-gbdt-v2')
+    ];
+  }
+
+  var state = { filter:'all', expanded:false, loading:true };
+
+  var V = {
+    go:{ label:'建议尽调', cls:'k-badge--success' },
+    hold:{ label:'待定', cls:'k-badge--warn' },
+    no:{ label:'否决', cls:'k-badge--danger' }
+  };
+
+  function $(s){ return document.querySelector(s); }
+  function $$(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function smooth(){ return REDUCE ? 'auto' : 'smooth'; }
+
+  function toast(msg){
+    var box = $('#toasts');
+    var el = document.createElement('div');
+    el.className = 'toast';
+    el.setAttribute('role', 'status');
+    el.textContent = msg;
+    box.appendChild(el);
+    while (box.children.length > 3) box.removeChild(box.firstChild);
+    setTimeout(function(){ el.remove(); }, 3000);
+  }
+
+  function scoreRing(score, id){
+    var r = 20, c = 2*Math.PI*r, off = c * (1 - score/100), g = 'ringGrad' + id;
+    return '<div class="dscore"><svg viewBox="0 0 48 48" aria-hidden="true">' +
+      '<defs><linearGradient id="'+g+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b7cff"/><stop offset=".55" stop-color="#c97cff"/><stop offset="1" stop-color="#ff9fc8"/></linearGradient></defs>' +
+      '<circle cx="24" cy="24" r="'+r+'" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="4"/>' +
+      '<circle cx="24" cy="24" r="'+r+'" fill="none" stroke="url(#'+g+')" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'"/></svg>' +
+      '<b>'+score+'</b></div>';
+  }
+
+  function chipRefs(ids){
+    return '<span class="refs">' + ids.map(function(id){ return '<button type="button" class="ref" data-ref="'+id+'" title="定位证据 '+id+'" aria-label="定位证据 '+id+'">['+id+']</button>'; }).join('') + '</span>';
+  }
+
+  function rowBlock(key, label, value, tone, refs){
+    return '<div class="row-block'+(tone ? ' is-'+tone : '')+'" data-testid="card-row-'+key+'"><dt>'+label+'</dt><dd>'+esc(value)+(refs?chipRefs(refs):'')+'</dd></div>';
+  }
+
+  function cardOf(d){
+    var v = V[d.verdict];
+    var rows = '';
+    rows += rowBlock('unit','单位经济', d.unit || '稳定期单件 $9.96（36%）；压力最差 $8.67（转化率下降 30%）；新品期单件 $0.47', d.gateOk ? 'good' : 'bad', ['E1','E2','E3','E4']);
+    rows += rowBlock('assumption','用途假设', d.assumption);
+    rows += rowBlock('absence','缺席诊断', d.absence);
+    if (d.window) rows += rowBlock('window','窗口期', d.window);
+    rows += rowBlock('demand','需求验证', d.demand, null, ['E3','E4','E5']);
+    rows += rowBlock('supply','供给结构', d.supply, null, ['E6']);
+    rows += rowBlock('analog','结构类比', d.analog, null, ['E7']);
+    rows += rowBlock('risk','风险过滤', (d.riskOk === false ? '⚠ ' : '✓ ') + d.risk, d.riskOk === false ? 'warn' : 'good', ['E8']);
+    rows += rowBlock('score','综合评分', d.scoreText || (d.score + '/100 · 成功率 ' + d.success + '（历史平均 22%）'), null, ['E9']);
+    rows += rowBlock('launch','上架月份敏感度', d.launch, null, ['E10']);
+    rows += rowBlock('gate','便宜闸门', d.gate, d.gateOk ? 'good' : 'bad', ['E1','E8','E9','E3','E6']);
+
+    var evs = evidenceOf(d);
+    var ev = '<details class="ev"><summary><span aria-hidden="true">▸</span> <b>证据清单</b> · '+evs.length+' 条证据<span style="color:var(--k-muted-2);margin-left:auto;">展开查看来源与参数</span></summary><ul class="ev__list">' +
+      evs.map(function(e){
+        return '<li class="ev__item" id="'+d.rank+'-'+e.id+'" data-testid="evidence-row"><span class="ev__id">'+e.id+'</span> '+esc(e.name)+
+          '<span class="ev__meta">（'+esc(e.type)+'）</span><div class="ev__body">'+esc(e.body)+'</div><div class="ev__src">'+esc(e.source)+'</div></li>';
+      }).join('') + '</ul></details>';
+
+    return '<details class="k-card dcard" data-card="'+d.rank+'" data-verdict="'+d.verdict+'" data-testid="decision-card">' +
+      '<summary>' + scoreRing(d.score, d.rank) +
+        '<div class="thumb" aria-hidden="true">'+esc(d.thumb)+'</div>' +
+        '<div class="dsum"><div class="dsum__top"><span class="dsum__rank">#'+d.rank+'</span>' +
+          '<span class="k-badge '+v.cls+'">'+v.label+'</span>' + (d.reason ? '<span class="dsum__meta">'+esc(d.reason)+'</span>' : '') + '</div>' +
+          '<div class="dsum__title">'+esc(d.asin + ' · ' + d.title)+'</div>' +
+          '<div class="dsum__meta">'+esc(d.price)+' · 综合评分 '+d.score+'/100 · 成功率 '+d.success+'</div></div>' +
+        '<span class="dchev" aria-hidden="true">▾</span>' +
+      '</summary>' +
+      '<div class="dcard__body"><dl class="rows">'+rows+'</dl>' +
+        '<div class="callouts"><div class="callout callout--unknown"><b>最大未知：</b>'+esc(d.unknown)+'</div>' +
+        '<div class="callout callout--action"><b>建议动作：</b>'+esc(d.action)+'</div></div>' + ev +
+      '</div></details>';
+  }
+
+  function renderSummary(){
+    var n = DATA.length, go = DATA.filter(function(d){ return d.verdict==='go'; }).length;
+    var avg = n ? Math.round(DATA.reduce(function(a,d){ return a + d.score; }, 0) / n) : 0;
+    $('#mCand').textContent = n; $('#mGo').textContent = go; $('#mAvg').textContent = avg;
+  }
+
+  function renderSkeleton(){
+    $('#filters').innerHTML = '';
+    $('#rankBody').innerHTML = [1,2,3,4,5].map(function(){ return '<tr><td colspan="6"><span class="sk"></span></td></tr>'; }).join('');
+    $('#cards').innerHTML = '<span class="sk sk--card"></span><span class="sk sk--card"></span><span class="sk sk--card"></span>';
+    $('#cards').setAttribute('aria-busy', 'true');
+  }
+
+  function renderError(){
+    document.body.classList.add('is-error');
+    $('#cards').innerHTML = '';
+    var box = $('#errorBox');
+    box.hidden = false;
+    box.className = 'k-card k-empty';
+    box.style.padding = '48px 24px';
+    box.innerHTML = '<div><div class="k-empty__title">报告加载失败</div><div class="k-empty__sub">网络异常，或报告尚未生成完成。</div><button class="k-btn k-btn--accent k-btn--sm" type="button" data-act="retry">重试</button></div>';
+  }
+
+  function render(){
+    state.loading = false;
+    $('#cards').removeAttribute('aria-busy');
+    renderSummary();
+    var counts = { all: DATA.length, go:0, hold:0, no:0 };
+    DATA.forEach(function(d){ counts[d.verdict]++; });
+    $('#filters').innerHTML = [
+      ['all','全部'],['go','建议尽调'],['hold','待定'],['no','否决']
+    ].map(function(it){
+      return '<button type="button" class="fbtn'+(state.filter===it[0]?' is-active':'')+'" data-filter="'+it[0]+'" aria-pressed="'+(state.filter===it[0])+'">'+it[1]+
+        ' <span class="fbtn__n">'+counts[it[0]]+'</span></button>';
+    }).join('');
+
+    var list = DATA.filter(function(d){ return state.filter==='all' || d.verdict===state.filter; });
+    $('#rankBody').innerHTML = list.map(function(d){
+      var v = V[d.verdict];
+      return '<tr class="'+(d.verdict==='go'?'is-top3':'')+'" data-row="'+d.rank+'" data-testid="ranking-row" tabindex="0">' +
+        '<td class="num rank-no">'+d.rank+'</td>' +
+        '<td><div class="cand"><div class="thumb" aria-hidden="true">'+esc(d.thumb)+'</div><span><b>'+esc(d.asin)+'</b><small>'+esc(d.price)+' · '+esc(d.title)+'</small></span></div></td>' +
+        '<td><div class="verdict-cell"><span class="k-badge '+v.cls+'">'+v.label+'</span>'+(d.reason?'<span class="reason" title="'+esc(d.reason)+'">'+esc(d.reason)+'</span>':'')+'</div></td>' +
+        '<td class="num" style="font-weight:var(--k-fw-semibold);">'+d.score+'</td>' +
+        '<td class="num">'+d.success+'</td>' +
+        '<td style="color:'+(d.gateOk?'var(--k-success)':'var(--k-down)')+';font-weight:var(--k-fw-semibold);">'+(d.gateOk?'过闸':'否决')+'</td></tr>';
+    }).join('') || '<tr class="empty-row"><td colspan="6">没有符合筛选的候选</td></tr>';
+
+    $('#cards').innerHTML = list.map(cardOf).join('') || '<div class="k-card k-empty" style="padding:32px;"><div><div class="k-empty__title">没有符合筛选的候选</div><div class="k-empty__sub">切换筛选条件看看。</div></div></div>';
+    $('#visibleCount').textContent = list.length + ' / ' + DATA.length;
+    $$('#cards details.dcard').forEach(function(d){ d.open = state.expanded; });
+    syncExpandButtons();
+  }
+
+  function syncExpandButtons(){
+    var ex = $('[data-act="expand"]'), co = $('[data-act="collapse"]');
+    if (ex) ex.setAttribute('aria-pressed', String(state.expanded));
+    if (co) co.setAttribute('aria-pressed', String(!state.expanded));
+  }
+
+  function openCard(rank){
+    var card = document.querySelector('.dcard[data-card="'+rank+'"]');
+    if (card){ card.open = true; card.scrollIntoView({ block:'center', behavior:smooth() }); }
+  }
+
+  /* ---------- interactions ---------- */
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-filter],[data-act],[data-ref],[data-row],[data-nav]');
+    if (!t) return;
+    if (t.dataset.nav){ e.preventDefault(); toast('原型只包含报告详情页，「' + t.dataset.nav + '」暂未开放'); return; }
+    if (t.dataset.filter){ state.filter = t.dataset.filter; render(); return; }
+    if (t.dataset.ref){
+      var card = t.closest('.dcard');
+      var id = t.dataset.ref;
+      var ev = card.querySelector('details.ev');
+      if (ev) ev.open = true;
+      var item = card.querySelector('.ev__item[id$="-'+id+'"]');
+      if (item){ item.classList.remove('is-flash'); void item.offsetWidth; item.classList.add('is-flash'); item.scrollIntoView({ block:'center', behavior:smooth() }); }
+      return;
+    }
+    if (t.dataset.row){ openCard(t.dataset.row); return; }
+    var act = t.dataset.act;
+    if (act === 'expand' || act === 'collapse'){
+      state.expanded = act === 'expand';
+      $$('#cards details.dcard').forEach(function(d){ d.open = state.expanded; });
+      syncExpandButtons();
+      toast(state.expanded ? '已展开全部决策卡' : '已收起全部决策卡');
+      return;
+    }
+    if (act === 'export'){
+      if (t.disabled) return;
+      var label = t.textContent, w = t.offsetWidth;
+      t.style.minWidth = w + 'px'; t.disabled = true; t.classList.add('is-loading'); t.textContent = '导出中';
+      setTimeout(function(){
+        t.disabled = false; t.classList.remove('is-loading'); t.textContent = label; t.style.minWidth = '';
+        if (STATE === 'exportfail') toast('导出失败，请重试');
+        else toast('导出已开始（演示数据）：选品报告_上线测试_2026-10-23.xls');
+      }, REDUCE ? 200 : 900);
+      return;
+    }
+    if (act === 'back'){ toast('原型只包含报告详情页，列表页暂未开放'); return; }
+    if (act === 'retry'){ location.search = ''; return; }
+    if (act === 'calm'){
+      var calm = !document.body.classList.contains('calm');
+      setCalm(calm, true);
+      return;
+    }
+  });
+
+  document.addEventListener('keydown', function(e){
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr[data-row]')){
+      e.preventDefault(); openCard(e.target.dataset.row);
+    }
+  });
+
+  function setCalm(calm, announce){
+    document.body.classList.toggle('calm', calm);
+    var b = $('[data-act="calm"]');
+    b.textContent = calm ? '恢复光效' : '降低光效';
+    b.setAttribute('aria-pressed', String(calm));
+    try { localStorage.setItem('ccamzsi-calm', calm ? '1' : '0'); } catch (_) {}
+    if (announce) toast(calm ? '已降低星空光效' : '已恢复星云光效');
+  }
+  try { if (localStorage.getItem('ccamzsi-calm') === '1') setCalm(true, false); } catch (_) {}
+
+  /* ---------- boot ---------- */
+  if (STATE === 'error'){ renderSkeleton(); setTimeout(renderError, REDUCE ? 0 : 500); }
+  else {
+    if (STATE === 'empty') DATA = [];
+    renderSkeleton();
+    setTimeout(render, REDUCE ? 0 : 450);
+  }
+})();
+</script>
+</body>
+</html>
