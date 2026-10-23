@@ -6,8 +6,178 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#06060d">
 <title>选品报告 · CCAMZSI</title>
-<link rel="stylesheet" href="assets/tokens.css">
-<link rel="stylesheet" href="assets/nebula-theme.css">
+<style>
+/* ===== tokens.css ===== */
+/* ============================================================
+   tokens.css — Kinetic base tokens + primitives (k- prefix)
+   Values follow the Nebula palette from 内部UI制作.md §2.2.
+============================================================ */
+:root{
+  --k-bg:#06060d;
+  --k-surface:rgba(255,255,255,.045);
+  --k-surface-2:rgba(255,255,255,.065);
+  --k-surface-3:rgba(255,255,255,.095);
+  --k-ink:#f4f2ff;
+  --k-ink-2:#c9c5e6;
+  --k-muted:#a7abc8;
+  --k-muted-2:#8288a9;
+  --k-line:rgba(255,255,255,.09);
+  --k-line-strong:rgba(255,255,255,.17);
+
+  --k-accent:#8b7cff;
+  --k-on-accent:#ffffff;
+  --k-accent-soft:rgba(139,124,255,.14);
+  --k-accent-border:rgba(139,124,255,.38);
+  --k-grad-cta:linear-gradient(100deg,#4b3acf 0%,#6b46e6 38%,#9750d8 72%,#c177ae 100%);
+
+  --k-success:#7cf5c6;
+  --k-success-soft:rgba(124,245,198,.12);
+  --k-warn:#ffd28a;
+  --k-warn-soft:rgba(255,210,138,.12);
+  --k-down:#ff8ba7;
+  --k-down-soft:rgba(255,139,167,.12);
+  --k-info:#7fe3ff;
+
+  --k-r-xs:4px;
+  --k-r-sm:8px;
+  --k-r-md:12px;
+  --k-r-lg:18px;
+  --k-r-pill:999px;
+
+  --k-fw-regular:400;
+  --k-fw-medium:500;
+  --k-fw-semibold:600;
+  --k-track-heading:-.02em;
+
+  --k-font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Hiragino Sans GB","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
+  --k-font-mono:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+
+  --k-dur-1:100ms;
+  --k-dur-2:160ms;
+  --k-dur-3:260ms;
+  --k-ease:cubic-bezier(.16,1,.3,1);
+
+  --k-shadow-card:0 1px 0 rgba(255,255,255,.05) inset,0 30px 80px -50px rgba(0,0,0,.9);
+  --k-shadow-lift:0 18px 50px -20px rgba(0,0,0,.9);
+}
+
+/* ---------- reset ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:var(--k-bg);color:var(--k-ink);font:13px/1.6 var(--k-font);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+h1,h2,h3,p,dl,dd,ul{margin:0;padding:0}
+ul{list-style:none}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid #c9b8ff;outline-offset:2px}
+table{border-spacing:0}
+
+/* ---------- card ---------- */
+.k-card{background:var(--k-surface);border:1px solid var(--k-line);border-radius:var(--k-r-lg);box-shadow:var(--k-shadow-card)}
+
+/* ---------- badge ---------- */
+.k-badge{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:var(--k-r-pill);border:1px solid var(--k-line-strong);background:var(--k-surface-2);color:var(--k-ink-2);font-size:10.5px;font-weight:var(--k-fw-semibold);line-height:1;white-space:nowrap}
+.k-badge--success{background:var(--k-success-soft);border-color:rgba(124,245,198,.35);color:#a9ffe0;box-shadow:0 0 18px -8px rgba(124,245,198,.7)}
+.k-badge--warn{background:var(--k-warn-soft);border-color:rgba(255,210,138,.35);color:#ffe3b0}
+.k-badge--danger{background:var(--k-down-soft);border-color:rgba(255,139,167,.38);color:#ffbdcb}
+.k-badge--accent{background:var(--k-accent-soft);border-color:var(--k-accent-border);color:#d2caff}
+
+/* ---------- button ---------- */
+.k-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 16px;border-radius:var(--k-r-md);border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--k-ink);font-size:13px;font-weight:var(--k-fw-medium);line-height:1;white-space:nowrap;
+  transition:transform var(--k-dur-3) var(--k-ease),background-color var(--k-dur-2) ease,border-color var(--k-dur-2) ease,box-shadow var(--k-dur-3) ease,filter var(--k-dur-2) ease,color var(--k-dur-2) ease}
+.k-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
+.k-btn:active{transform:translateY(1px)}
+.k-btn[disabled]{cursor:progress;opacity:.8}
+.k-btn--sm{height:30px;padding:0 12px;font-size:12px;border-radius:10px}
+.k-btn--ghost{background:transparent}
+.k-btn--quiet{background:transparent;border-color:transparent;color:var(--k-muted)}
+.k-btn--quiet:hover{background:var(--k-surface-2);border-color:transparent;color:var(--k-ink)}
+.k-btn--accent{background:var(--k-grad-cta);border-color:transparent;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 12px 30px -14px rgba(120,80,240,.9)}
+.k-btn--accent:hover{background:var(--k-grad-cta);border-color:transparent;filter:brightness(1.08);transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 16px 36px -14px rgba(130,90,250,1)}
+.k-btn--accent:active{transform:translateY(0)}
+.k-btn.is-loading{position:relative;pointer-events:none}
+.k-btn.is-loading::after{content:"";width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:k-spin .8s linear infinite}
+@keyframes k-spin{to{transform:rotate(360deg)}}
+
+/* ---------- empty / error ---------- */
+.k-empty{display:grid;place-items:center;text-align:center;color:var(--k-muted)}
+.k-empty__title{font-size:14px;font-weight:var(--k-fw-semibold);color:var(--k-ink)}
+.k-empty__sub{margin-top:4px;font-size:11.5px;color:var(--k-muted)}
+.k-empty .k-btn{margin-top:14px}
+
+.k-sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+</style>
+<style>
+/* ===== nebula-theme.css ===== */
+/* ============================================================
+   nebula-theme.css — Nebula (星云深色) theme layer
+   Starfield background, glass cards, glow states, calm mode.
+   Spec: 内部UI制作.md §2.2–2.8
+============================================================ */
+html[data-theme="nebula"]{color-scheme:dark;background:#06060d}
+
+/* ---------- global background ---------- */
+html[data-theme="nebula"] body.k-app{
+  background:
+    radial-gradient(52% 40% at 84% 2%, rgba(108,66,220,.20), transparent 62%),
+    radial-gradient(34% 30% at 98% 40%, rgba(255,159,200,.10), transparent 66%),
+    radial-gradient(42% 36% at 94% 96%, rgba(127,227,255,.08), transparent 68%),
+    radial-gradient(50% 40% at 2% 100%, rgba(30,44,110,.24), transparent 66%),
+    #06060d;
+  background-attachment:fixed;
+}
+html[data-theme="nebula"] body.k-app::before{
+  content:"";position:fixed;inset:-40px;z-index:0;pointer-events:none;opacity:.5;
+  background-image:
+    radial-gradient(1.3px 1.3px at 14% 20%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(1px 1px at 36% 68%, rgba(255,215,198,.4), transparent 60%),
+    radial-gradient(1.2px 1.2px at 62% 32%, rgba(255,255,255,.4), transparent 60%),
+    radial-gradient(1px 1px at 82% 76%, rgba(255,159,200,.35), transparent 60%),
+    radial-gradient(1px 1px at 8% 86%, rgba(127,227,255,.3), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280' viewBox='0 0 280 280'%3E%3Ccircle cx='143.2' cy='148.4' r='0.77' fill='rgb(255,196,214)' fill-opacity='0.81'/%3E%3Ccircle cx='150.6' cy='22.4' r='0.74' fill='rgb(255,196,214)' fill-opacity='0.57'/%3E%3Ccircle cx='134.4' cy='236.2' r='0.70' fill='rgb(255,196,214)' fill-opacity='0.71'/%3E%3Ccircle cx='163.1' cy='35.7' r='0.76' fill='rgb(214,226,255)' fill-opacity='0.55'/%3E%3Ccircle cx='236.4' cy='225.5' r='0.67' fill='rgb(214,226,255)' fill-opacity='0.67'/%3E%3Ccircle cx='70.5' cy='15.7' r='1.10' fill='rgb(214,226,255)' fill-opacity='0.48'/%3E%3Ccircle cx='41.0' cy='208.2' r='0.62' fill='rgb(214,226,255)' fill-opacity='0.65'/%3E%3Ccircle cx='236.7' cy='40.1' r='1.08' fill='rgb(214,226,255)' fill-opacity='0.53'/%3E%3Ccircle cx='7.1' cy='21.5' r='0.83' fill='rgb(214,226,255)' fill-opacity='0.62'/%3E%3Ccircle cx='75.7' cy='140.6' r='0.51' fill='rgb(214,226,255)' fill-opacity='0.69'/%3E%3Ccircle cx='12.6' cy='124.5' r='1.01' fill='rgb(214,226,255)' fill-opacity='0.56'/%3E%3Ccircle cx='130.5' cy='98.8' r='0.48' fill='rgb(214,226,255)' fill-opacity='0.55'/%3E%3Ccircle cx='212.6' cy='84.1' r='0.62' fill='rgb(214,226,255)' fill-opacity='0.81'/%3E%3Ccircle cx='103.4' cy='105.7' r='1.17' fill='rgb(214,226,255)' fill-opacity='0.68'/%3E%3Ccircle cx='115.0' cy='257.3' r='0.68' fill='rgb(214,226,255)' fill-opacity='0.48'/%3E%3Ccircle cx='28.9' cy='156.7' r='0.95' fill='rgb(214,226,255)' fill-opacity='0.88'/%3E%3Ccircle cx='182.5' cy='182.2' r='1.09' fill='rgb(214,226,255)' fill-opacity='0.38'/%3E%3Ccircle cx='38.5' cy='181.1' r='0.75' fill='rgb(214,226,255)' fill-opacity='0.86'/%3E%3Ccircle cx='185.9' cy='137.9' r='0.58' fill='rgb(214,226,255)' fill-opacity='0.73'/%3E%3Ccircle cx='228.7' cy='261.8' r='0.45' fill='rgb(214,226,255)' fill-opacity='0.56'/%3E%3C/svg%3E");
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,repeat;
+  animation:k-drift 140s linear infinite alternate;
+}
+@keyframes k-drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-28px,20px,0)}}
+html[data-theme="nebula"] body.k-app > *{position:relative;z-index:1}
+html[data-theme="nebula"] body.k-app > .toasts{position:fixed;z-index:120}
+
+/* ---------- calm mode: 降低光效 ---------- */
+body.calm::before{animation:none!important;opacity:.28!important}
+html[data-theme="nebula"] body.k-app.calm{
+  background:
+    radial-gradient(52% 40% at 84% 2%, rgba(108,66,220,.08), transparent 62%),
+    radial-gradient(50% 40% at 2% 100%, rgba(30,44,110,.12), transparent 66%),
+    #06060d;
+  background-attachment:fixed;
+}
+body.calm .k-card{box-shadow:0 1px 0 rgba(255,255,255,.04) inset!important}
+body.calm .k-badge--success,body.calm .k-btn--accent{box-shadow:none!important}
+body.calm .k-card[open]{box-shadow:none!important}
+
+/* ---------- glass cards ---------- */
+html[data-theme="nebula"] .k-card{
+  background:linear-gradient(160deg,rgba(255,255,255,.052),rgba(255,255,255,.022));
+  border-color:rgba(255,255,255,.09);
+  border-radius:18px;
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 30px 80px -50px rgba(0,0,0,.9);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+}
+html[data-theme="nebula"] .k-card[open]{
+  border-color:rgba(139,124,255,.35);
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 40px 100px -50px rgba(139,124,255,.55);
+}
+
+/* ---------- scrollbars ---------- */
+html[data-theme="nebula"] *{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
+html[data-theme="nebula"] ::-webkit-scrollbar{width:8px;height:8px}
+html[data-theme="nebula"] ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:8px}
+html[data-theme="nebula"] ::selection{background:rgba(139,124,255,.4);color:#fff}
+</style>
 <style>
   /* ---------- shell ---------- */
   body.k-app{ padding:0; }

@@ -7,8 +7,7 @@
 | 页面 | 文件 | 说明 |
 | --- | --- | --- |
 | 登录页 | [`nebula-login.html`](nebula-login.html) | 单文件。右侧 WebGL2 体积星云 + Canvas 2D 星轨 / 星尘 + 静态预渲染星核；左侧登录表单与校验、跳过 / 重播、响应式、`prefers-reduced-motion`、WebGL2 降级 |
-| 报告详情页 | [`report.html`](report.html) | Nebula 主题：摘要指标、结论筛选、排序表、7 张决策卡（默认折叠）、`[E#]` 证据定位、降低光效、导出 XLS（演示） |
-| 主题样式 | [`assets/tokens.css`](assets/tokens.css) · [`assets/nebula-theme.css`](assets/nebula-theme.css) | 设计 token、基础组件、星空背景 / 玻璃卡片 / 发光状态 |
+| 报告详情页 | [`report.html`](report.html) | 单文件。Nebula 主题：摘要指标、结论筛选、排序表、7 张决策卡（默认折叠）、`[E#]` 证据定位、降低光效、导出 XLS（演示）。设计 token、基础组件、星空背景 / 玻璃卡片的样式全部内联在文件头部（`tokens.css` + `nebula-theme.css` 两段），不依赖外部样式请求 |
 
 `index.html` 只负责跳转到登录页。
 
