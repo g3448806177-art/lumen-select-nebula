@@ -2,6 +2,8 @@
 
 星云主题的选品情报云界面：登录页 + 选品报告详情页。纯静态 HTML / CSS / JS，无构建步骤、无外部依赖。
 
+**在线演示：<https://g3448806177-art.github.io/lumen-select-nebula/>**
+
 | 页面 | 文件 | 说明 |
 | --- | --- | --- |
 | 登录页 | [`nebula-login.html`](nebula-login.html) | 单文件。右侧 WebGL2 体积星云 + Canvas 2D 星轨 / 星尘 + 静态预渲染星核；左侧登录表单与校验、跳过 / 重播、响应式、`prefers-reduced-motion`、WebGL2 降级 |
